@@ -1,0 +1,25 @@
+.oe_whatsapp_login_form {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+#btn_toggle_whatsapp {
+    background-color: #25D366;
+    border-color: #25D366;
+    color: white;
+}
+
+#btn_toggle_whatsapp:hover {
+    background-color: #128C7E;
+    border-color: #128C7E;
+}
+
+.whatsapp_login_options .fa-whatsapp {
+    font-size: 1.2em;
+    vertical-align: middle;
+}
+
+#otp_timer {
+    font-weight: bold;
+    color: #d9534f;
+}

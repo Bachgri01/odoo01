@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="login" inherit_id="web.login" name="WhatsApp Login">
+        <xpath expr="//form[hasclass('oe_login_form')]" position="attributes">
+            <attribute name="id">standard_login_form</attribute>
+        </xpath>
+        
+        <xpath expr="//form[@id='standard_login_form']" position="inside">
+            <!-- Add toggle button at the top of the form -->
+            <div class="whatsapp_login_options mb-3 text-center" style="order: -1;">
+                <button type="button" class="btn btn-success w-100 mb-2 text-white" id="btn_toggle_whatsapp" style="background-color: #25D366; border-color: #25D366;">
+                    <i class="fa fa-whatsapp mr-2"/> Login by WhatsApp
+                </button>
+            </div>
+        </xpath>
+
+        <xpath expr="//form[@id='standard_login_form']" position="after">
+            <form id="whatsapp_login_form" class="oe_whatsapp_login_form d-none" role="form" method="post">
+                <div class="whatsapp_login_options mb-3 text-center">
+                     <button type="button" class="btn btn-secondary w-100 mb-2" disabled="disabled" style="background-color: #25D366; border-color: #25D366; opacity: 1; color: white;">
+                        <i class="fa fa-whatsapp mr-2"/> WhatsApp Login Active
+                    </button>
+                </div>
+
+                <div class="form-group field-mobile mb-3">
+                    <label for="mobile">WhatsApp Number</label>
+                    <input type="text" name="mobile" id="whatsapp_mobile" class="form-control" placeholder="e.g. +212600000000" required="required"/>
+                </div>
+
+                <div id="otp_section" class="d-none mt-3">
+                    <div class="form-group field-otp mb-3">
+                        <label for="otp">Enter OTP</label>
+                        <input type="text" name="otp" id="whatsapp_otp" class="form-control" placeholder="6-digit code"/>
+                    </div>
+                    <div class="text-muted small mb-2">
+                        Code expires in <span id="otp_timer">02:00</span>
+                    </div>
+                </div>
+
+                <div class="alert alert-danger d-none" id="whatsapp_error" role="alert"/>
+                <div class="alert alert-success d-none" id="whatsapp_success" role="alert"/>
+
+                <div class="clearfix oe_login_buttons text-center mb-1 pt-3">
+                    <button type="button" id="btn_send_otp" class="btn btn-primary btn-block w-100 mb-2">Validate &amp; Send Code</button>
+                    <button type="button" id="btn_verify_otp" class="btn btn-primary btn-block w-100 mb-2 d-none">Login</button>
+                    <button type="button" id="btn_resend_otp" class="btn btn-link btn-block w-100 mb-2 d-none">Resend code</button>
+                    <button type="button" id="btn_back_to_login" class="btn btn-link btn-block w-100">Back to Standard Login</button>
+                </div>
+            </form>
+        </xpath>
+    </template>
+
+    <template id="whatsapp_2fa_page" name="WhatsApp 2FA Verification">
+        <t t-call="web.login_layout">
+            <div class="whatsapp_2fa_container p-4">
+                <div class="text-center mb-4">
+                    <i class="fa fa-whatsapp text-success" style="font-size: 48px;"/>
+                    <h3 class="mt-2">Two-Step Verification</h3>
+                    <p class="text-muted">A verification code has been sent to your WhatsApp number <strong t-out="mobile"/>.</p>
+                </div>
+                
+                <form id="whatsapp_2fa_form" class="oe_whatsapp_2fa_form" role="form">
+                    <input type="hidden" name="redirect" t-att-value="redirect"/>
+                    <div class="form-group mb-3">
+                        <label for="otp" class="form-label">Enter Verification Code</label>
+                        <input type="text" name="otp" id="whatsapp_2fa_otp" class="form-control form-control-lg text-center" placeholder="6-digit code" required="required" autofocus="autofocus"/>
+                    </div>
+
+                    <div class="alert alert-danger d-none" id="whatsapp_2fa_error" role="alert"/>
+
+                    <button type="button" id="btn_verify_2fa" class="btn btn-primary btn-block w-100 btn-lg mb-3">Verify &amp; Login</button>
+                    
+                    <div class="text-center">
+                        <a href="/web/login" class="btn btn-link">Back to Login</a>
+                    </div>
+                </form>
+            </div>
+        </t>
+    </template>
+</odoo>
