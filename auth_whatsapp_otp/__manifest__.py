@@ -16,6 +16,11 @@
         'views/res_users_views.xml',
         'views/login_templates.xml',
     ],
+    'images': [
+        'static/description/main_screenshot.png',
+        'static/description/main_1.png',
+        'static/description/main_2.png',
+    ],
     'assets': {
         'web.assets_frontend': [
             'auth_whatsapp_otp/static/src/css/whatsapp_login.css',
