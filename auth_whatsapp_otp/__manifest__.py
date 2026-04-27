@@ -4,6 +4,8 @@
     'license': 'OPL-1',
     'category': 'setting',
     'summary': 'Login via WhatsApp OTP using UltraMsg',
+    'price': 9.99,
+    'currency': 'EUR',
     'description': """
         This module allows users to log in using a one-time password sent via WhatsApp.
         It uses the UltraMsg API for sending messages.
