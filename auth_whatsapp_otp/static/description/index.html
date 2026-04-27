@@ -4,45 +4,175 @@
     <meta charset="utf-8"/>
     <title>WhatsApp OTP Authentication</title>
     <style>
-        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; margin: 20px; }
-        h1 { color: #0b6f5d; margin-bottom: 10px; }
-        h2 { color: #23735f; margin-top: 24px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            color: #333; 
+            line-height: 1.6; 
+            margin: 0; 
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 { 
+            color: #0b6f5d; 
+            margin-bottom: 10px; 
+            border-bottom: 3px solid #25D366;
+            padding-bottom: 10px;
+        }
+        h2 { 
+            color: #23735f; 
+            margin-top: 24px;
+            border-left: 4px solid #25D366;
+            padding-left: 12px;
+        }
         p, li { font-size: 14px; }
         ul { margin: 0 0 16px 20px; }
-        .section { margin-bottom: 24px; }
+        .section { 
+            margin-bottom: 24px; 
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 16px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .highlight {
+            background-color: #e8f5e9;
+            padding: 12px;
+            border-left: 4px solid #25D366;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+        .badge {
+            display: inline-block;
+            background: #25D366;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
     <h1>WhatsApp OTP Authentication</h1>
-    <p>Ce module permet une connexion Odoo via un code OTP envoyé par WhatsApp, avec une interface de validation intégrée au login standard.</p>
+    <p><strong>Authenticatification sécurisée via OTP WhatsApp pour Odoo</strong></p>
+    <p>Ce module permet une connexion Odoo via un code OTP (mot de passe à usage unique) envoyé directement par WhatsApp, avec une interface de validation intégrée au login standard. Implémentation via l'API UltraMsg pour un déploiement rapide et fiable.</p>
 
     <div class="section">
-        <h2>Fonctionnalités</h2>
+        <h2>Fonctionnalités principales</h2>
         <ul>
-            <li>Bouton de login WhatsApp sur la page de connexion</li>
-            <li>Envoi d'un code OTP sur WhatsApp</li>
-            <li>Validation du code OTP et redirection vers Odoo</li>
-            <li>Page de vérification 2FA dédiée</li>
+            <li><span class="badge">✓</span>Bouton "Login by WhatsApp" intégré à la page de connexion</li>
+            <li><span class="badge">✓</span>Saisie du numéro WhatsApp au format international (+212...)</li>
+            <li><span class="badge">✓</span>Envoi automatique d'un code OTP à 6 chiffres sur WhatsApp</li>
+            <li><span class="badge">✓</span>Validation du code OTP directement dans l'interface</li>
+            <li><span class="badge">✓</span>Page de vérification 2FA dédiée pour renforcer la sécurité</li>
+            <li><span class="badge">✓</span>Expiration automatique du code après 2 minutes</li>
+            <li><span class="badge">✓</span>Bouton pour renvoyer le code si nécessaire</li>
+            <li><span class="badge">✓</span>Gestion complète des erreurs et messages de feedback</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Images de démonstration</h2>
+        <p><strong>Écran principal de login WhatsApp :</strong></p>
+        <img src="main_screenshot.png" alt="Écran principal"/>
+        
+        <p><strong>Flux d'authentification :</strong></p>
+        <img src="main_1.png" alt="Flux d'authentification"/>
+        
+        <p><strong>Écran de vérification :</strong></p>
+        <img src="main_2.png" alt="Écran de vérification"/>
+    </div>
+
+    <div class="section">
+        <h2>Pré-requis</h2>
+        <ul>
+            <li>Odoo 16 ou supérieur</li>
+            <li>Module <strong>web</strong> actif</li>
+            <li>Compte UltraMsg configuré avec les clés API</li>
+            <li>Accès internet depuis le serveur Odoo vers l'API UltraMsg</li>
+            <li>Numéro WhatsApp Business autorisé par UltraMsg</li>
         </ul>
     </div>
 
     <div class="section">
         <h2>Installation</h2>
-        <ul>
-            <li>Copier le module dans le dossier des modules Odoo.</li>
-            <li>Mettre à jour la liste des modules.</li>
-            <li>Installer le module depuis l'interface Odoo.</li>
-        </ul>
+        <ol>
+            <li>Copier le module <code>auth_whatsapp_otp</code> dans le dossier des modules Odoo</li>
+            <li>Redémarrer le serveur Odoo</li>
+            <li>Mettre à jour la liste des modules (Modules → Mettre à jour la liste des modules)</li>
+            <li>Installer le module <strong>WhatsApp OTP Authentication</strong></li>
+        </ol>
     </div>
 
     <div class="section">
         <h2>Configuration</h2>
-        <p>Assurez-vous que le module <strong>web</strong> est installé et que l'accès à l'API UltraMsg est configuré correctement.</p>
+        <div class="highlight">
+            <strong>Important :</strong> Configurez les paramètres UltraMsg avant d'utiliser ce module.
+        </div>
+        <ul>
+            <li>Accédez aux paramètres du système (Paramètres → Configuration)</li>
+            <li>Renseignez votre clé API UltraMsg</li>
+            <li>Configurez le numéro WhatsApp Business autorié</li>
+            <li>Activez la validation en deux étapes si souhaité</li>
+            <li>Testez la connexion avant de déployer en production</li>
+        </ul>
     </div>
 
     <div class="section">
-        <h2>Remarques</h2>
-        <p>Le code OTP expire après 2 minutes. Un message d'erreur s'affiche en cas de problème d'envoi ou de validation.</p>
+        <h2>Flux d'utilisation</h2>
+        <ol>
+            <li>L'utilisateur accède au formulaire de login Odoo</li>
+            <li>Il clique sur <strong>"Login by WhatsApp"</strong></li>
+            <li>Il saisit son numéro WhatsApp au format international</li>
+            <li>Il clique sur <strong>"Validate & Send Code"</strong></li>
+            <li>Un code OTP est envoyé via WhatsApp</li>
+            <li>L'utilisateur saisit le code reçu</li>
+            <li>Il clique sur <strong>"Login"</strong> pour se connecter</li>
+            <li>L'utilisateur est redirigé vers le tableau de bord Odoo</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>Caractéristiques de sécurité</h2>
+        <ul>
+            <li><strong>OTP à 6 chiffres :</strong> Code sécurisé et difficile à deviner</li>
+            <li><strong>Expiration :</strong> Le code expire automatiquement après 2 minutes</li>
+            <li><strong>Limite de tentatives :</strong> Protection contre les attaques par force brute</li>
+            <li><strong>Authentification 2FA :</strong> Vérification supplémentaire disponible</li>
+            <li><strong>Validation côté serveur :</strong> Tous les codes sont vérifiés du côté serveur</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Dépannage</h2>
+        <ul>
+            <li><strong>Le code n'est pas envoyé :</strong> Vérifiez la configuration d'UltraMsg et la connectivité Internet</li>
+            <li><strong>Code expiré :</strong> Cliquez sur "Resend code" pour recevoir un nouveau code</li>
+            <li><strong>Erreur de validation :</strong> Vérifiez que vous avez entré les 6 chiffres correctement</li>
+            <li><strong>Retour au login standard :</strong> Cliquez sur "Back to Standard Login" pour utiliser email/mot de passe</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Remarques importantes</h2>
+        <ul>
+            <li>Le module fonctionne uniquement si UltraMsg est correctement configuré</li>
+            <li>Les codes OTP ne sont valides que 2 minutes</li>
+            <li>Les utilisateurs peuvent basculer entre login WhatsApp et login standard</li>
+            <li>Tous les événements de connexion sont enregistrés dans les logs Odoo</li>
+        </ul>
+    </div>
+
+    <div class="section" style="background: #f0f8ff; border-left: 4px solid #2196F3;">
+        <h2 style="color: #1565c0;">Support</h2>
+        <p>Pour plus d'informations sur la configuration d'UltraMsg, consultez la documentation officielle.</p>
+        <p>En cas de problème, consultez les logs du serveur Odoo pour les détails des erreurs.</p>
     </div>
 </body>
 </html>
