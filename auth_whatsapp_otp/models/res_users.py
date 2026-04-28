@@ -8,7 +8,7 @@ class ResUsers(models.Model):
 
     whatsapp_otp = fields.Char(string='WhatsApp OTP', copy=False)
     whatsapp_otp_expiry = fields.Datetime(string='WhatsApp OTP Expiry', copy=False)
-    whatsapp_2fa_enabled = fields.Boolean(string='WhatsApp 2FA Enabled', default=True)
+    whatsapp_2fa_enabled = fields.Boolean(string='WhatsApp 2FA Enabled', default=False)
 
     def generate_whatsapp_otp(self):
         otp = ''.join(random.choices(string.digits, k=6))

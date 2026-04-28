@@ -14,6 +14,25 @@ from odoo.addons.web.controllers.home import Home
 class WhatsAppOTPLogin(Home):
 
     def _send_whatsapp_message(self, mobile, message):
+        """Main dispatcher for sending WhatsApp messages"""
+        ICP = request.env['ir.config_parameter'].sudo()
+        gateway = ICP.get_param('auth_whatsapp_otp.whatsapp_gateway', 'ultramsg')
+
+        if gateway == 'ultramsg':
+            return self._send_ultramsg_message(mobile, message)
+        elif gateway == 'twilio':
+            return self._send_twilio_message(mobile, message)
+        elif gateway == 'infobip':
+            return self._send_infobip_message(mobile, message)
+        elif gateway == 'messagebird':
+            return self._send_messagebird_message(mobile, message)
+        elif gateway == 'meta':
+            return self._send_meta_message(mobile, message)
+        
+        _logger.error(f"Unknown WhatsApp gateway: {gateway}")
+        return False
+
+    def _send_ultramsg_message(self, mobile, message):
         """Helper to send WhatsApp message via UltraMsg"""
         ICP = request.env['ir.config_parameter'].sudo()
         instance_id = ICP.get_param('auth_whatsapp_otp.ultramsg_instance_id')
@@ -42,7 +61,151 @@ class WhatsAppOTPLogin(Home):
             _logger.error(f"UltraMsg Error: {res_data}")
             return False
         except Exception as e:
-            _logger.error(f"WhatsApp Sending Error: {str(e)}")
+            _logger.error(f"UltraMsg Sending Error: {str(e)}")
+            return False
+
+    def _send_twilio_message(self, mobile, message):
+        """Helper to send WhatsApp message via Twilio"""
+        ICP = request.env['ir.config_parameter'].sudo()
+        account_sid = ICP.get_param('auth_whatsapp_otp.twilio_account_sid')
+        auth_token = ICP.get_param('auth_whatsapp_otp.twilio_auth_token')
+        from_number = ICP.get_param('auth_whatsapp_otp.twilio_phone_number')
+
+        if not account_sid or not auth_token or not from_number:
+            _logger.error("Twilio SID, Token or Phone Number not configured.")
+            return False
+
+        import requests
+        from requests.auth import HTTPBasicAuth
+        
+        url = f"https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json"
+        
+        # Ensure mobile is in international format with whatsapp: prefix for Twilio
+        to_number = mobile
+        if not to_number.startswith('whatsapp:'):
+            to_number = f"whatsapp:{to_number}"
+
+        payload = {
+            "From": from_number,
+            "To": to_number,
+            "Body": message
+        }
+        
+        try:
+            response = requests.post(url, data=payload, auth=HTTPBasicAuth(account_sid, auth_token))
+            if response.status_code in [200, 201]:
+                return True
+            _logger.error(f"Twilio Error: {response.text}")
+            return False
+        except Exception as e:
+            _logger.error(f"Twilio Sending Error: {str(e)}")
+            return False
+
+    def _send_infobip_message(self, mobile, message):
+        """Helper to send WhatsApp message via Infobip"""
+        ICP = request.env['ir.config_parameter'].sudo()
+        base_url = ICP.get_param('auth_whatsapp_otp.infobip_base_url')
+        api_key = ICP.get_param('auth_whatsapp_otp.infobip_api_key')
+        sender = ICP.get_param('auth_whatsapp_otp.infobip_sender')
+
+        if not base_url or not api_key or not sender:
+            _logger.error("Infobip Base URL, API Key or Sender not configured.")
+            return False
+
+        import requests
+        url = f"{base_url.rstrip('/')}/whatsapp/1/message/text"
+        
+        payload = {
+            "from": sender,
+            "to": mobile.lstrip('+'), # Infobip usually wants number without +
+            "content": {"text": message}
+        }
+        headers = {
+            "Authorization": f"App {api_key}",
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+        
+        try:
+            response = requests.post(url, json=payload, headers=headers)
+            if response.status_code in [200, 201]:
+                return True
+            _logger.error(f"Infobip Error: {response.text}")
+            return False
+        except Exception as e:
+            _logger.error(f"Infobip Sending Error: {str(e)}")
+            return False
+
+    def _send_messagebird_message(self, mobile, message):
+        """Helper to send WhatsApp message via MessageBird"""
+        ICP = request.env['ir.config_parameter'].sudo()
+        api_key = ICP.get_param('auth_whatsapp_otp.messagebird_api_key')
+        channel_id = ICP.get_param('auth_whatsapp_otp.messagebird_channel_id')
+
+        if not api_key or not channel_id:
+            _logger.error("MessageBird API Key or Channel ID not configured.")
+            return False
+
+        import requests
+        url = "https://conversation.messagebird.com/v1/send"
+        
+        payload = {
+            "to": mobile.lstrip('+'),
+            "from": channel_id,
+            "type": "text",
+            "content": {"text": message}
+        }
+        headers = {
+            "Authorization": f"AccessKey {api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            response = requests.post(url, json=payload, headers=headers)
+            if response.status_code in [200, 201, 202, 204]:
+                return True
+            _logger.error(f"MessageBird Error: {response.text}")
+            return False
+        except Exception as e:
+            _logger.error(f"MessageBird Sending Error: {str(e)}")
+            return False
+
+    def _send_meta_message(self, mobile, message):
+        """Helper to send WhatsApp message via Meta Cloud API"""
+        ICP = request.env['ir.config_parameter'].sudo()
+        token = ICP.get_param('auth_whatsapp_otp.meta_api_token')
+        phone_id = ICP.get_param('auth_whatsapp_otp.meta_phone_number_id')
+
+        if not token or not phone_id:
+            _logger.error("Meta API Token or Phone ID not configured.")
+            return False
+
+        import requests
+        url = f"https://graph.facebook.com/v17.0/{phone_id}/messages"
+        
+        # NOTE: Meta Cloud API usually requires using TEMPLATES for initiated messages.
+        # However, for testing or if the 24h window is open, text can work.
+        # For OTP, it's best to use a template named 'otp' or similar.
+        # Here we attempt a free-form text message.
+        payload = {
+            "messaging_product": "whatsapp",
+            "to": mobile.lstrip('+'),
+            "type": "text",
+            "text": {"body": message}
+        }
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            response = requests.post(url, json=payload, headers=headers)
+            if response.status_code in [200, 201]:
+                return True
+            _logger.error(f"Meta Error: {response.text}")
+            return False
+        except Exception as e:
+            _logger.error(f"Meta Sending Error: {str(e)}")
             return False
 
     @http.route('/web/login/whatsapp/send_otp', type='json', auth="none", methods=['POST'])
