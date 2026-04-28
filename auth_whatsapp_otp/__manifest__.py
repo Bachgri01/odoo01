@@ -3,6 +3,8 @@
     'version': '1.0',
     'license': 'OPL-1',
     'category': 'setting',
+    'Author': 'BACHGRI',
+    'author': 'BACHGRI',
     'summary': 'Login via WhatsApp OTP using multiple gateways',
     'price': 9.99,
     'currency': 'EUR',
